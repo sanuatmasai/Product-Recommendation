@@ -24,6 +24,8 @@ function ProductCatalog() {
   const [viewLoading, setViewLoading] = useState({});
   const [likeSuccess, setLikeSuccess] = useState({});
   const [viewSuccess, setViewSuccess] = useState({});
+  const [purchaseLoading, setPurchaseLoading] = useState({});
+  const [purchaseSuccess, setPurchaseSuccess] = useState({});
   const navigate = useNavigate();
   const userId = getUserIdFromToken();
 
@@ -82,6 +84,26 @@ function ProductCatalog() {
     setTimeout(() => setViewSuccess(s => ({ ...s, [productId]: false })), 1200);
   };
 
+  // Handle Purchase
+  const handlePurchase = async (productId) => {
+    if (!userId) { alert('Login required'); return; }
+    setPurchaseLoading(l => ({ ...l, [productId]: true }));
+    setPurchaseSuccess(s => ({ ...s, [productId]: false }));
+    try {
+      await fetch('http://127.0.0.1:8000/purchase', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ user_id: userId, product_id: productId })
+      });
+      setPurchaseSuccess(s => ({ ...s, [productId]: true }));
+    } catch {}
+    setPurchaseLoading(l => ({ ...l, [productId]: false }));
+    setTimeout(() => setPurchaseSuccess(s => ({ ...s, [productId]: false })), 1200);
+  };
+
   return (
     <div className="catalog-page">
       <h2>Product Catalog</h2>
@@ -115,10 +137,12 @@ function ProductCatalog() {
               <div style={{display:'flex', gap:8, marginTop:10}}>
                 <button style={{flex:1, background:'#ff9800'}} onClick={() => handleView(product.product_id)} disabled={viewLoading[product.product_id]}>{viewLoading[product.product_id] ? '...' : 'View'}</button>
                 <button style={{flex:1, background:'#e91e63'}} onClick={() => handleLike(product.product_id)} disabled={likeLoading[product.product_id]}>{likeLoading[product.product_id] ? '...' : 'Like'}</button>
+                <button style={{flex:1, background:'#4caf50'}} onClick={() => handlePurchase(product.product_id)} disabled={purchaseLoading[product.product_id]}> {purchaseLoading[product.product_id] ? '...' : 'Purchase'}</button>
               </div>
               <div style={{height:18}}>
                 {likeSuccess[product.product_id] && <span style={{color:'#e91e63'}}>Liked!</span>}
                 {viewSuccess[product.product_id] && <span style={{color:'#ff9800'}}>Viewed!</span>}
+                {purchaseSuccess[product.product_id] && <span style={{color:'#4caf50'}}>Purchased!</span>}
               </div>
             </div>
           ))}

@@ -43,7 +43,7 @@ class ProductList(BaseModel):
 
 # User interaction creation schema
 class UserInteractionCreate(BaseModel):
-    user_id: str
+    user_id: int
     product_id: int
     # interaction_type: str  # 'view', 'like', 'purchase'
 

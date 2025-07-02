@@ -13,6 +13,7 @@ function getUserIdFromToken() {
 
 function MyHistoryPage() {
   const [history, setHistory] = useState([]);
+  const [products, setProducts] = useState({});
   const [loading, setLoading] = useState(true);
   const userId = getUserIdFromToken();
 
@@ -23,8 +24,17 @@ function MyHistoryPage() {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
     })
       .then(res => res.json())
-      .then(data => {
-        setHistory(data.history || []);
+      .then(async data => {
+        const hist = data.history || [];
+        setHistory(hist);
+        // Fetch product details for each unique product_id
+        const uniqueIds = [...new Set(hist.map(h => h.product_id))];
+        const prods = {};
+        await Promise.all(uniqueIds.map(async id => {
+          const res = await fetch(`http://127.0.0.1:8000/products/${id}`);
+          if (res.ok) prods[id] = await res.json();
+        }));
+        setProducts(prods);
         setLoading(false);
       });
   }, [userId]);
@@ -41,11 +51,18 @@ function MyHistoryPage() {
       ) : (
         <div style={{display:'flex', flexDirection:'column', gap:16}}>
           {history.length === 0 && <div>No interactions yet.</div>}
-          {history.map((item, i) => (
-            <div key={i} style={{border:'1px solid #ccc', borderRadius:8, padding:12, background:'#f9f9ff'}}>
-              <b>{item.interaction_type.toUpperCase()}</b> on product #{item.product_id} at {new Date(item.timestamp).toLocaleString()}
-            </div>
-          ))}
+          {history.map((item, i) => {
+            const prod = products[item.product_id];
+            return (
+              <div key={i} style={{display:'flex',alignItems:'center',border:'1px solid #ccc', borderRadius:12, padding:12, background:'#f9f9ff', boxShadow:'0 2px 8px rgba(25,118,210,0.04)'}}>
+                {prod && <img src={prod.image_url} alt={prod.product_name} style={{width:60,height:60,objectFit:'cover',borderRadius:8,marginRight:16}} />}
+                <div style={{flex:1}}>
+                  <b style={{color:'#1976d2'}}>{prod ? prod.product_name : `Product #${item.product_id}`}</b>
+                  <div style={{fontSize:14, color:'#888'}}>{item.interaction_type.toUpperCase()} at {new Date(item.timestamp).toLocaleString()}</div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
       <style>{`.lds-dual-ring {display: inline-block;width: 48px;height: 48px;}
