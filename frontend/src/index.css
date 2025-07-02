@@ -1,0 +1,54 @@
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #f7f7f7;
+  margin: 0;
+  padding: 0;
+}
+.catalog-page, .login-page, .register-page, .product-detail-page {
+  max-width: 900px;
+  margin: 32px auto;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  padding: 32px;
+}
+input, select, button {
+  padding: 8px;
+  margin: 4px 0;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+button {
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  font-weight: 500;
+  box-shadow: 0 1px 4px rgba(25,118,210,0.08);
+}
+button:hover {
+  background: #125ea2;
+  box-shadow: 0 2px 8px rgba(25,118,210,0.15);
+}
+.product-card:hover {
+  box-shadow: 0 2px 8px rgba(25,118,210,0.15);
+  border-color: #1976d2;
+}
+nav {
+  box-shadow: 0 2px 8px rgba(25,118,210,0.08);
+  border-radius: 0 0 8px 8px;
+}
+nav a {
+  transition: color 0.2s;
+}
+nav a:hover {
+  color: #ffeb3b !important;
+}
+.spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80px;
+}
